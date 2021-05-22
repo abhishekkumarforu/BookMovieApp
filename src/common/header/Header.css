@@ -1,0 +1,41 @@
+.Navbar {
+    background-color: #222;
+    /* position: fixed; */
+    /* top: 0;
+    left: auto;
+    right: 0; */
+    /* height: 50px; */
+    padding: 8px 32px 8px 16px;
+    box-sizing: border-box;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0px 0px 5px silver;
+  }
+  
+  .Toolbar {
+    display: flex;
+    /* padd ing: 8px 32px 8px 16px; */
+    /* min-height: 56px;
+    align-items: center;
+    padding: 0px 10px; */
+  }
+  
+  .logoDiv {
+    flex-grow: 1;
+  }
+
+  .logo{
+      background-color: #ff7f7f;
+      height: 30px;
+      animation: rotateLogo 8s linear 0s infinite;
+
+  }
+
+@keyframes rotateLogo {
+  0% {transform: rotateY(0deg);}
+  20% {transform: rotateY(72deg);}
+  40% {transform: rotateY(144deg);}
+  60% {transform: rotateY(216deg);}
+  80% {transform: rotateY(288deg);}
+  100% {transform: rotateY(360deg);}
+}
