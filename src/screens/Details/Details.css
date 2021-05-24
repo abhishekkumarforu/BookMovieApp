@@ -1,0 +1,27 @@
+.back-btn{
+    margin-left: 24px;
+    margin-top: 8px;
+    margin-bottom: 0px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.section-container{
+    display: flex;
+}
+
+.left-section{
+    width: 20%;
+} 
+
+.middle-section{
+    width: 60%;
+}
+
+.right-section{
+    width: 20%;
+}
+
+.subtitle{
+    font-weight: bold;
+}

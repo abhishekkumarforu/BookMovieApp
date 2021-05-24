@@ -1,0 +1,28 @@
+.home{
+    margin-top: 0px;
+}
+
+.upcoming-header{
+    background-color: #ff9999;
+    padding: 8px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.released-container{
+    display: flex;
+}
+
+.released-movies-section{
+    width: 76%;
+    margin: 16px;
+}
+
+.filter-section{
+    width:  24%;
+    margin: 16px;
+}
+
+.released-img{
+    cursor: pointer;
+}
