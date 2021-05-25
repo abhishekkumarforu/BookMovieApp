@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../common/header/Header";
+
 import "./Home.css";
 import {
   GridList,
@@ -27,54 +28,32 @@ const useStyles = makeStyles((theme) => ({
   card: {
     margin: theme.spacing(),
     minWidth: 240,
-    maxWidth: 240
+    maxWidth: 240,
   },
   cardHeader: {
     color: theme.palette.primary.light,
     margin: theme.spacing(),
     marginBottom: 0,
     minWidth: 240,
-    maxWidth: 240
+    maxWidth: 240,
   },
 }));
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-const names = [
-  "Oliver Hansen",
-  "Van Henry",
-  "April Tucker",
-  "Ralph Hubbard",
-  "Omar Alexander",
-  "Carlos Abbott",
-  "Miriam Wagner",
-  "Bradley Wilkerson",
-  "Virginia Andrews",
-  "Kelly Snyder",
-];
-
-function Home() {
+function Home(props) {
   const classes = useStyles();
 
   const [movies, setMovies] = useState([]);
   const [releasedMovies, setReleasedMovies] = useState([]);
+  const [genresList, setGenresList] = useState([]);
+  const [artistsList, setArtistsList] = useState([]);
   const [movieName, setMovieName] = useState("");
   const [genres, setGenres] = useState([]);
   const [artists, setArtists] = useState([]);
   const [dateStart, setDateStart] = useState("");
   const [dateEnd, setDateEnd] = useState("");
 
-  useEffect(() => {
-    fetch("v1/movies", {
+  const getMovies = () => {
+    fetch(props.baseUrl + "movies", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -85,13 +64,68 @@ function Home() {
       .then((response) => {
         setMovies(response.movies);
       });
-  }, []);
+  };
 
-  console.log("render")
+  const getReleasedMovies = () => {
+    let genresStr = genres.length > 0 && "genre=" + genres.join(',')
+    let artistsStr = artists.length > 0 && "artists=" + artists.join(',')
+    let title = movieName && 'title=' + movieName
+    let query = `?page=1&limit=10${title?'&'+title:''}${genresStr?'&'+genresStr:''}${artistsStr?'&'+artistsStr:''}`
+    fetch(`${props.baseUrl}movies${query}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+      },
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        setReleasedMovies(response.movies);
+      });
+  };
+
+  const getGenresMovies = () => {
+    fetch(props.baseUrl + "genres", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+      },
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        setGenresList(response.genres);
+      });
+  };
+
+  const getArtistsMovies = () => {
+    fetch(props.baseUrl + "artists", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+      },
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        setArtistsList(response.artists);
+      });
+  };
+
+  const goToDetailsPage = (id) => {
+    props.history.push(`/movie/${id}`)
+  }
+
+  useEffect(() => {
+    getMovies();
+    getGenresMovies();
+    getArtistsMovies();
+    getReleasedMovies()
+  }, []);
 
   return (
     <div>
-      <Header />
+      <Header baseUrl={props.baseUrl} />
       <div className="home">
         <div className="upcoming-header">Upcoming Movies</div>
         <div>
@@ -107,9 +141,9 @@ function Home() {
         <div className="released-container">
           <div className="released-movies-section">
             <GridList cellHeight={350} cols={4}>
-              {movies.map((tile) => (
+              {releasedMovies.map((tile) => (
                 <GridListTile key={tile.id} className="released-img">
-                  <img src={tile.poster_url} alt={tile.title} />
+                  <img src={tile.poster_url} alt={tile.title} onClick={()=>goToDetailsPage(tile.id)} />
                   <GridListTileBar title={tile.title} />
                 </GridListTile>
               ))}
@@ -142,10 +176,10 @@ function Home() {
                     input={<Input />}
                     renderValue={(selected) => selected.join(", ")}
                   >
-                    {names.map((name) => (
-                      <MenuItem key={name + "900"} value={name}>
-                        <Checkbox checked={genres.indexOf(name) > -1} />
-                        <ListItemText primary={name} />
+                    {genresList.map((genre) => (
+                      <MenuItem key={genre.id} value={genre.genre}>
+                        <Checkbox checked={genres.indexOf(genre.genre) > -1} />
+                        <ListItemText primary={genre.genre} />
                       </MenuItem>
                     ))}
                   </Select>
@@ -162,10 +196,10 @@ function Home() {
                     input={<Input />}
                     renderValue={(selected) => selected.join(", ")}
                   >
-                    {names.map((name) => (
-                      <MenuItem key={name + "121"} value={name}>
-                        <Checkbox checked={artists.indexOf(name) > -1} />
-                        <ListItemText primary={name} />
+                    {artistsList.map((artist) => (
+                      <MenuItem key={artist.id} value={artist.first_name+' '+artist.last_name}>
+                        <Checkbox checked={artists.indexOf(artist.first_name+' '+artist.last_name) > -1} />
+                        <ListItemText primary={artist.first_name+' '+artist.last_name} />
                       </MenuItem>
                     ))}
                   </Select>
@@ -199,8 +233,8 @@ function Home() {
                 <br />
                 <br />
                 <br />
-                <Button variant="contained" color="primary" fullWidth={true}>
-                  BOOK SHOW
+                <Button variant="contained" color="primary" fullWidth={true} onClick={getReleasedMovies}>
+                  Apply
                 </Button>
               </CardContent>
             </Card>
